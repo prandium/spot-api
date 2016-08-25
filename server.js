@@ -1,0 +1,53 @@
+/* Dependencies */
+var express = require("express"),
+	mongoose = require("mongoose"),
+	bodyParser = require("body-parser"),
+	morgan = require("morgan"),
+	passport = require("passport"),	
+	config = require("./config/database"),
+	apiRoutes = express.Router(),
+	server = express(),	
+	port = 3000;
+
+mongoose.connect(config.database, function (error, response) {
+	if (error) 
+		console.log("Error: " + error);				
+	else 
+		console.log("The server is running now. ");
+});
+
+/* Static */
+server.use(express.static('static'));
+server.use(express.static('app_cover'));
+
+server.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header("Access-Control-Allow-Origin",  req.headers.origin);
+    res.header("Access-Control-Allow-Headers", (req.headers['access-control-request-headers']) ? req.headers['access-control-request-headers'] : "x-requested-with");
+    res.header("Access-Control-Allow-Methods", (req.headers['access-control-request-method']) ? req.headers['access-control-request-method'] : "POST, GET, PUT, DELETE, OPTIONS");
+	next();
+});
+
+server.use(bodyParser.urlencoded({extended: false}));
+server.use(bodyParser.json());
+
+server.use(morgan("dev"));
+
+server.use(passport.initialize());
+
+server.get("/", function (request, response) {
+	response.send("API");
+});
+
+server.use("/api", apiRoutes);
+
+server.use('/static', express.static(__dirname + '/static'));
+
+server.listen(process.env.PORT || port);
+
+require("./config/passport")(passport);
+
+require("./controllers/auth/user.controller")(apiRoutes);
+require("./controllers/companies/company.controller")(apiRoutes);
+require("./controllers/roles/role.controller")(apiRoutes);
+require("./controllers/uploads/upload.controller")(apiRoutes);
