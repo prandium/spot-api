@@ -56,7 +56,7 @@ module.exports = function (apiRoutes) {
 	function signIn(request, response) {                 
 		User.findOne({ username: request.body.username.toLowerCase() }, function(err, user) {
 			if (err) { return response.status(400).send({success: false, msg: ERRORS.AUTH_FAILED.Text, code: ERRORS.AUTH_FAILED.Code }); }							
-			if (!user) { return response.status(400).send({success: false, msg: ERRORS.AUTH_USER_NOT_FOUND.Text, Code: ERRORS.AUTH_USER_NOT_FOUND.Code }); };							
+			if (!user) { return response.status(400).send({success: false, msg: ERRORS.AUTH_USER_NOT_FOUND.Text, code: ERRORS.AUTH_USER_NOT_FOUND.Code }); };							
 
 			user.comparePassword(request.body.password, function(err, isMatch) {
 
