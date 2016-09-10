@@ -4,7 +4,7 @@ var crypto = require ("crypto"),
 	multer = require("multer"),
 	upload = multer({ storage : multer.diskStorage({
 		destination: function (req, file, cb) {
-			cb(null, "../../media/")
+			cb(null, "media/")
 		},
 		filename: function (req, file, cb) {			
 			crypto.pseudoRandomBytes(16, function (err, raw) {
@@ -57,10 +57,10 @@ var crypto = require ("crypto"),
 		Image.create(newImages, function (err, data) {
 			for (var i=0; i < data.length; i++) {
 				imagesIDs.push(data[i].id);
-			}
+			};
 
 			if (err) return response.status(500).send({success: false, msg: err});
-			else return response.status(201).send({success: true, msg: "Image were added successfully.", invalidFiles: invalidFiles, validFiles: imagesIDs })
+			else return response.status(201).send({success: true, msg: "Success.", invalidFiles: invalidFiles, validFiles: imagesIDs })
 		});					
 	};			
 };

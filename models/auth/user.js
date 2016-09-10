@@ -5,10 +5,10 @@ var	bcrypt = require("bcrypt");
 var UserSchema = new Schema({
 	username: { type: String, unique: true, required: true },
 	password: { type: String, required: true },
-	firstName: { type: String, required: true },
-	lastName: { type: String, required: true },			
-	email: { type: String, required: true },	
-	phone: [{ type: String, require: true }],
+	firstName: { type: String },
+	lastName: { type: String },			
+	email: { type: String },	
+	phone: [{ type: String }],
 	address: { type: String },
 	isActive: Boolean,
 	isSuperadmin: Boolean

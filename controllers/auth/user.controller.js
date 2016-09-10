@@ -14,17 +14,17 @@ module.exports = function (apiRoutes) {
 			return response.status(400).send({success: false, msg: ERRORS.USERNAME_PASS_EMPTY.Text, code: ERRORS.USERNAME_PASS_EMPTY.Code }); }	
 		else {
 			if (request.body.password !== request.body._password) { return response.status(400).send({success: false, msg: ERRORS.PASSWORDS_DIFF.Text, code: ERRORS.PASSWORDS_DIFF.Code }); }				
-			if (!request.body.firstName || !request.body.lastName) { return response.status(400).send({success: false, msg: ERRORS.FIRST_LAST_NAME_EMPTY.Text, code: ERRORS.FIRST_LAST_NAME_EMPTY.Code }); };				
+			//if (!request.body.firstName || !request.body.lastName) { return response.status(400).send({success: false, msg: ERRORS.FIRST_LAST_NAME_EMPTY.Text, code: ERRORS.FIRST_LAST_NAME_EMPTY.Code }); };				
 			
 			var _User = new User({
 				username: request.body.username.replace(" ", "").toLowerCase(),
 				password: request.body.password,
-				firstName: request.body.firstName,
-				lastName: request.body.lastName,
-				email: request.body.email,
-				phone: request.body.phone,
-				address: request.body.address,
-				isActive: true,
+				//firstName: request.body.firstName,
+				//lastName: request.body.lastName,
+				//email: request.body.email,
+				//phone: request.body.phone,
+				//address: request.body.address,
+				isActive: false,
 				isSuperadmin: false
 			});		
 
@@ -41,9 +41,9 @@ module.exports = function (apiRoutes) {
 						code: ERRORS.USER_SUCCESSFULLY.Code, 
 						data: { 
 							token: jwt.encode(claims, config.secret),
-							username: _User.username,
-							firstName: _User.firstName,
-							lastName: _User.lastName
+							//username: _User.username,
+							//firstName: _User.firstName,
+							//lastName: _User.lastName
 						}
 					}); 
 				};
@@ -84,9 +84,9 @@ module.exports = function (apiRoutes) {
 								success: true,
 								data: {
 									token: token, 
-									username: user.username,
-									firstName: user.firstName,
-									lastName: user.lastName
+									//username: user.username,
+									// firstName: user.firstName,
+									// lastName: user.lastName
 								}
 							});            					
 						}
@@ -110,11 +110,35 @@ module.exports = function (apiRoutes) {
 				user.address = request.body.address;
 				
 				user.save(function (err) {
-					if(!err) return response.status(200).send({ success: true, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });				
+					if(!err) return response.status(200).send({ success: true, msg: "Success" });				
 					else return response.status(400).send({ success: false, msg: ERRORS.EDIT_USER_SUCCESSFULLY.Text, code: ERRORS.EDIT_USER_SUCCESSFULLY.Code });
 				});
 			}
 			else return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });			
+		});
+	};
+
+	apiRoutes.get("/isFirstLogin", firstLogin);
+	function firstLogin(request, response) {
+		var token = request.body.token || request.query.token || request.headers["authorization"];        
+        
+        if (token) { user = jwt.decode(token, config.secret); }
+        else return response.status(403).send({ success: false, message: 'No token provided.' });
+
+		User.findOne({ _id: user._id }, function(err, user) {
+			if (err) 
+				return response.status(400).send({success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });			
+			if (!user)
+				return response.status(400).send({success: false, msg: ERRORS.AUTH_USER_NOT_FOUND.Text, Code: ERRORS.AUTH_USER_NOT_FOUND.Code });
+			
+			if (!user.isActive) {
+				user.isActive = false;
+				user.save(function (err) {
+					if(err) { return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code }) };
+				});
+			}
+										
+			return response.status(200).send({ success: true, msg: { isFirstLogin: !user.isActive } });
 		});
 	};
 	
