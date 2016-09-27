@@ -1,28 +1,25 @@
 module.exports = function processImg (filesrc) {
 	var gulp = require('gulp');
 	var smushit = require('gulp-smushit');
-	//var Jimp = require("jimp");
-	var thumbnailPath = "media/thumbnail/" + filesrc.split("\\")[filesrc.split("\\").length - 1];
+  var imageName = filesrc.split("\\")[filesrc.split("\\").length - 1];
+	var thumbnailPath = "media/thumbnail/" + imageName;
+  var im = require("imagemagick");
 
-	// Jimp.read(filesrc).then(function (lenna) {
-	// 	lenna.resize(450, Jimp.AUTO)         
-	// 		.write(thumbnailPath); // save
-	// }).catch(function (err) {
-	// 	console.error(err);
-	// });
+  gulp.src(filesrc)    
+  .pipe(smushit())
+  .pipe(gulp.dest('media/'));
+      
+  var options = {
+    width: 400,
+    height: 400,
+    srcPath: filesrc,
+    dstPath: thumbnailPath
+  };
 
-	gulp.src(filesrc)    
-			.pipe(smushit())
-			.pipe(gulp.dest('media/'));
+  im.resize(options, function(err) {
+    if(err) { throw err; }    
+  });  
 
-  gulp.src(thumbnailPath)    
-		.pipe(smushit())
-		.pipe(gulp.dest('media/thumbnail/'));
-
-    // .pipe(smushit())        
-    // .pipe(gulp.dest("media/thumbnail/"));
-
-  // save 300 x 200
   return;
   //.pipe(gulp.dest('../media/320'))
   // save 120 x 120

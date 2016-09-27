@@ -8,7 +8,11 @@ var ERRORS = {
     AUTH_FAILED:                    { Text: "Authentication failed.", Code: 6, Type: "User" },
     AUTH_USER_NOT_FOUND:            { Text: "Authentication failed. User not found.", Code: 7, Type: "User" },
     AUTH_WRONG_PASSWORD:            { Text: "Authentication failed. Wrong password.", Code: 8, Type: "User" },    
-    EDIT_USER_SUCCESSFULLY:         { Text: "User was updated successfully.", Code: 9, Type: "User" }
+    EDIT_USER_SUCCESSFULLY:         { Text: "User was updated successfully.", Code: 9, Type: "User" },
+    NO_TOKEN:                       { Text: "No token provided", Code: 10, Type: "Service" },
+    REQUEST_FAILED:                 { Text: "Invalid request", Code: 11, Type: "Service" },
+    INVALID_TOKEN:                  { Text: "Invalid token", Code: 12, Type: "Service" },
+    NOT_SUPERADMIN:                 { Text: "Access is denied", Code: 13, Type: "Service" }
 }
 
 module.exports = ERRORS

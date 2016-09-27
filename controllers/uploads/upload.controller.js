@@ -41,7 +41,7 @@ var crypto = require ("crypto"),
 				thumbnail: { 
 					Name: request.files[i].filename,
 					Type: request.files[i].mimetype,
-					Path: request.files[i].path,
+					Path: request.files[i].destination + "thumbnail/" + request.files[i].filename,
 				},
 				createdAt: new Date(),
 				updatedAt: null,				
@@ -54,13 +54,15 @@ var crypto = require ("crypto"),
 			else invalidFiles.push(image);			
 		};
 
-		Image.create(newImages, function (err, data) {
-			for (var i=0; i < data.length; i++) {
-				imagesIDs.push(data[i].id);
-			};
+		if (newImages) {
+			Image.create(newImages, function (err, data) {
+				for (var i=0; i < data.length; i++) {
+					imagesIDs.push({ id: data[i].id, path: data[i].thumbnail.Path });
+				};
 
-			if (err) return response.status(500).send({success: false, msg: err});
-			else return response.status(201).send({success: true, msg: "Success.", invalidFiles: invalidFiles, validFiles: imagesIDs })
-		});					
+				if (err) return response.status(500).send({success: false, msg: err});
+				else return response.status(201).send({success: true, msg: "Success.", invalidFiles: invalidFiles, validFiles: imagesIDs })
+			});				
+		};	
 	};			
 };

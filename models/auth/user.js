@@ -10,6 +10,7 @@ var UserSchema = new Schema({
 	email: { type: String },	
 	phone: [{ type: String }],
 	address: { type: String },
+	photo: { type: Schema.ObjectId, ref: "Image" },
 	isActive: Boolean,
 	isSuperadmin: Boolean
 });

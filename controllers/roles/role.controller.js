@@ -13,7 +13,10 @@ module.exports = function (apiRoutes) {
 				canRead: request.body.canRead,
 				canEdit: request.body.canEdit,
 				canCreate: request.body.canCreate,
-				default: request.body.default
+				default: request.body.default,
+				//menuId: request.body.menuIds,
+				adminGroup: request.body.adminGroup,
+    			employeeGroup: request.body.employeeGroup				
 			});
 			
 			newRole.save(function(err) {

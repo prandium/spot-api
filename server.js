@@ -17,8 +17,8 @@ mongoose.connect(config.database, function (error, response) {
 });
 
 /* Static */
-server.use(express.static('static'));
-server.use(express.static('app_cover'));
+server.use(express.static('media'));
+server.use(express.static('thumbnail'));
 
 server.use(function(req, res, next) {
     res.header("Access-Control-Allow-Credentials", true);
@@ -41,7 +41,7 @@ server.get("/", function (request, response) {
 
 server.use("/api", apiRoutes);
 
-server.use('/static', express.static(__dirname + '/static'));
+server.use('/media', express.static(__dirname + '/media'));
 
 server.listen(process.env.PORT || port);
 
@@ -51,3 +51,4 @@ require("./controllers/auth/user.controller")(apiRoutes);
 require("./controllers/companies/company.controller")(apiRoutes);
 require("./controllers/roles/role.controller")(apiRoutes);
 require("./controllers/uploads/upload.controller")(apiRoutes);
+require("./controllers/app/menu.controller")(apiRoutes);
