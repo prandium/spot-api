@@ -52,3 +52,4 @@ require("./controllers/companies/company.controller")(apiRoutes);
 require("./controllers/roles/role.controller")(apiRoutes);
 require("./controllers/uploads/upload.controller")(apiRoutes);
 require("./controllers/app/menu.controller")(apiRoutes);
+require("./controllers/app/type.controller")(apiRoutes);

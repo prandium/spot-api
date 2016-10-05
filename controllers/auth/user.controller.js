@@ -168,7 +168,6 @@ module.exports = function (apiRoutes) {
 	function getUserInfo(request, response) {
 		var token = request.body.token || request.query.token || request.headers["authorization"],
 			_user;        
-        
         if (token) { 
 			_user = jwt.decode(token, config.secret); 
 		}
@@ -187,15 +186,4 @@ module.exports = function (apiRoutes) {
 			return response.status(200).send({ success: true, data: { username: user.username, fullName: user.firstName + " " + user.lastName, photo: user.photo.thumbnail.Path } });
 		}).populate('photo');
 	};
-	
-	// apiRoutes.put("/deleteuser", deleteUser);
-	// function deleteUser(request, response) {
-	// 	User.findOne(request.params._id, function (err, user) {
-	// 		user.isActive = false;
-	// 		user.save(function (err) {
-	// 			if(!err) return response.status(200).send({ success: true, msg: "Success." });
-	// 			else return response.status(400).send({ success: false, msg: "Failed." + err });
-	// 		});
-	// 	});
-	// };
 };

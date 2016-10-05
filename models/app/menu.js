@@ -4,7 +4,6 @@ var	Schema = mongoose.Schema;
 var MenuSchema = new Schema({
 	name: { type: String, unique: true, required: true },
 	icon: { type: String },
-	//isSelected: { type: Boolean },
 	selected: Boolean,
 	position: { type: Number },
 	isDefault: { type: Boolean },

@@ -21,19 +21,4 @@ module.exports = function processImg (filesrc) {
   });  
 
   return;
-  //.pipe(gulp.dest('../media/320'))
-  // save 120 x 120
-  // .pipe(imageResize({
-  //   width: 120,
-  //   height: 120,
-  //   crop: true
-  // }))
-  // .pipe(gulp.dest('../media/120'))
-  // // save 48 x 48
-  // .pipe(imageResize({
-  //   width: 48,
-  //   height: 48,
-  //   crop: true
-  // }))
-  // .pipe(gulp.dest('../media/48'));
 };
