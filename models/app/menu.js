@@ -8,6 +8,7 @@ var MenuSchema = new Schema({
 	position: { type: Number },
 	isDefault: { type: Boolean },
 	isActive: { type: Boolean },
-	protectedLevel: { type: Number }
+	protectedLevel: { type: Number },
+	path: { type: String }
 });
 module.exports = mongoose.model("Menu", MenuSchema);

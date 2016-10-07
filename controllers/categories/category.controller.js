@@ -1,13 +1,13 @@
 module.exports = function (apiRoutes) {
 
-	var Type = require("../../models/app/type"),
+	var Category = require("../../models/categories/category"),
 		User = require("../../models/auth/user"),
 		jwt = require("jwt-simple"),
 		config = require("../../config/database"),
 		ERRORS = require("../../constants/errors");		
 		
-	apiRoutes.post("/type/add", addType);
-	function addType(request, response) {
+	apiRoutes.post("/category/add", addCategory);
+	function addCategory(request, response) {
 		var token = request.body.token || request.query.token || request.headers["authorization"],
 			_user;        
         
@@ -32,23 +32,21 @@ module.exports = function (apiRoutes) {
 
 			if(!request.body.name) { return response.status(400).send({ success: false, msgdata: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code }); }	
 			else {
-				var newType = new Type({
+				var newCategory = new Category({
 					name: request.body.name,
-					image: request.body.image,
-					position: request.body.position,
-					categories: request.body.categories,
+					icon: request.body.icon,
 					isActive: true
 				});
 				
-				newType.save(function(err) {
+				newCategory.save(function(err) {
 					if (err) { return response.status(500).send({success: false, msg: err}); }					
-					else { return response.status(201).send({success: true, msg: "Item created successfully."}); };					
+					else { return response.status(201).send({success: true, msg: "Category created successfully."}); };					
 				});
 			};								
 		});		
 	};
 
-	apiRoutes.put("/type/update", update);
+	apiRoutes.put("/category/update", update);
 	function update() {
 		var token = request.body.token || request.query.token || request.headers["authorization"],
 			_user;        
@@ -56,13 +54,12 @@ module.exports = function (apiRoutes) {
         if (token) { _user = jwt.decode(token, config.secret); }
         else return response.status(403).send({ success: false, message: ERRORS.NO_TOKEN.Text });
 
-		Type.findOne({ _id: request.body._id }, function (err, type){
+		Category.findOne({ _id: request.body._id }, function (err, category){
 			if (!err) {							
-				type.name = request.body.name;
-				type.image = request.body.image;
-				type.position = request.body.position;								
+				category.name = request.body.name;
+				category.icon = request.body.icon;
 				
-				type.save(function (err) {
+				category.save(function (err) {
 					if(!err) return response.status(200).send({ success: true, data: "Success" });				
 					else return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });
 				});
@@ -71,15 +68,15 @@ module.exports = function (apiRoutes) {
 		});
 	};
 
-	apiRoutes.get("/type/getAll", getAll);
+	apiRoutes.get("/category/getAll", getAll);
 	function getAll(request, response) {
-        Type.find({}, function(err, _type) {
+        Category.find({}, function(err, _category) {
 			if (err) { 
 				return response.status(500).send({ success: false, msg: err }); 
 			}				
 			else { 
-				return response.status(200).send({ success: true, data: _type }); 
+				return response.status(200).send({ success: true, data: _category }); 
 			};            	            
-        }).populate('image').populate('categories');
-    };
+        });
+    };	
 };

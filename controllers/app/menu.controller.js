@@ -40,6 +40,7 @@ module.exports = function (apiRoutes) {
 					position: request.body.position,
 					isDefault: request.body.isDefault,
 					isActive: true,
+					path: request.body.path,
 					protectedLevel: request.body.protectedLevel
 				});
 				
