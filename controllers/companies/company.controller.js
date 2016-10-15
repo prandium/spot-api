@@ -1,7 +1,10 @@
 module.exports = function (apiRoutes) {
 
 	var Company = require("../../models/companies/company"),
-		ERRORS = require("../../constants/errors");		
+		ERRORS = require("../../constants/errors")
+		User = require("../../models/auth/user"),
+		jwt = require("jwt-simple"),
+		config = require("../../config/database");		
 		
 	apiRoutes.post("/companies/add", addCompany);
 	function addCompany(request, response) {
@@ -15,27 +18,45 @@ module.exports = function (apiRoutes) {
 		else {
 			var newCompany = new Company({
 				name: request.body.name,
-                description: request.body.description,
-                logo: request.body.logo,
-                members: request.body.members,
-                isActive: false,
+				description: request.body.description,
+				logo: request.body.logo,
+				members: request.body.members,
+				isActive: true,
 				location: request.body.location,
-    			address: request.body.address,
-				type: request.body.type,
-                createdAt: new Date().getUTCDate(),				
-                updatedAt: null,
-                createdBy: _user._id,
-                updatedBy: null				
+				address: request.body.address,
+				city: request.body.city,
+				state: request.body.state,
+				categories: request.body.categories,
+				createdAt: new Date().getUTCDate(),
+				updatedAt: null,
+				createdBy: _user._id,
+				updatedBy: null,
+				ranking: 0,
+				privateKey: request.body.privateKey,
+				publicKey: request.body.publicKey,
+				allowCreditCard: request.body.allowCreditCard,
+				plan: request.body.plan				
 			});
 			
 			newCompany.save(function(err) {
 				if (err) { return response.status(500).send({success: false, msg: err}); }					
-				else { return response.status(201).send({success: true, msg: "Role created successfully."}); };					
+				else { return response.status(201).send({success: true, msg: "Company added successfully."}); };					
 			});
 		};
-	};
+	};	
 
-	apiRoutes.get("/companies/update", update);
+	apiRoutes.get("/companies/getStores", getStores);
+	function getStores(request, response) {				
+        Company.find( request.query.lastId 
+			? { $and : [filter(request.query), { "_id" : { $gt: request.query.lastId } }] } 
+			: filter(request.query)			
+			, function(err, _company) {
+			if (err) { return response.status(500).send(err); }				
+			else { return response.status(200).send(_company); };            	            
+        }).limit(parseInt(request.query.pageSize));
+    };	
+
+	apiRoutes.put("/companies/update", update);
 	function update() {
 		var token = request.body.token || request.query.token || request.headers["authorization"],
 			_user;        
@@ -92,4 +113,38 @@ module.exports = function (apiRoutes) {
 			else { return response.status(200).send(_company); };            	            
         });
     };	
+
+	// FILTERS
+	function filter(query) {
+		return query.longitude && query.latitude 
+				? { $and: [filterByLocation(query.longitude, query.latitude), filterByName(query.text)] } 
+				: query.categoryId 
+				? filterByCategory(query.categoryId) 
+				: {}
+	}
+
+	function filterByLocation(longitude, latitude){
+		return {location:
+			{ $near :
+				{              
+					$geometry: { type: "Point",  coordinates: [ longitude, latitude] },            
+					$maxDistance: 5000
+				}
+			}
+		}
+	}
+
+	function filterByName(name) {
+		return {
+			$text: {
+				$search: name,
+				$caseSensitive: false,
+				$diacriticSensitive: true
+			}
+		}
+	};
+
+	function filterByCategory(categoryId) {
+		return { categories : categoryId } 
+	}
 };

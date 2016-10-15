@@ -10,6 +10,7 @@
     "finalhandler": "0.5.0",
     "gulp": "3.9.1",
     "jwt-simple": "0.5.0",
+    "mathjs": "^3.5.3",
     "mongoose": "4.3.7",
     "morgan": "1.7.0",
     "multer": "1.1.0",
