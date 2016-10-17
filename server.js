@@ -21,9 +21,9 @@ server.use(express.static('media'));
 server.use(express.static('thumbnail'));
 
 server.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Credentials", true);
-    res.header("Access-Control-Allow-Origin",  req.headers.origin);
-    res.header("Access-Control-Allow-Headers", (req.headers['access-control-request-headers']) ? req.headers['access-control-request-headers'] : "x-requested-with");
+    res.header("Access-Control-Allow-Credentials", false);
+    res.header("Access-Control-Allow-Origin",  '*');
+    res.header("Access-Control-Allow-Headers", (req.headers['access-control-request-headers']) ? req.headers['access-control-request-headers'] : "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", (req.headers['access-control-request-method']) ? req.headers['access-control-request-method'] : "POST, GET, PUT, DELETE, OPTIONS");
 	next();
 });
