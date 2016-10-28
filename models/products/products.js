@@ -9,6 +9,7 @@ var ProductSchema = new Schema({
     price: { type: Number },
     tags: { type: String },
     isActive: { type: Boolean },    
+    company: { type: Schema.ObjectId, ref:"Company" },
     createdAt: { type: Date },
     updatedAt: { type: Date },
     createdBy: { type: Schema.ObjectId, ref:"User" },

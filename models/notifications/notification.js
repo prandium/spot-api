@@ -8,6 +8,7 @@ var NotificationSchema = new Schema({
     to: { type: Schema.ObjectId, ref:"User" },
     viewed: { type: Boolean },
     date: { type: Date },
+    status: { type: Number }, // Depends of the notification type  
     url: { type: String }
 });
 

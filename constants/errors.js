@@ -12,7 +12,9 @@ var ERRORS = {
     NO_TOKEN:                       { Text: "No token provided", Code: 10, Type: "Service" },
     REQUEST_FAILED:                 { Text: "Invalid request", Code: 11, Type: "Service" },
     INVALID_TOKEN:                  { Text: "Invalid token", Code: 12, Type: "Service" },
-    NOT_SUPERADMIN:                 { Text: "Access is denied", Code: 13, Type: "Service" }
+    NOT_SUPERADMIN:                 { Text: "Access is denied", Code: 13, Type: "Service" },
+    // IS NOT AN ERROR, PENDING CHANGE THIS (iva)
+    IVA:                            16
 }
 
 module.exports = ERRORS
