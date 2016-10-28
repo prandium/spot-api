@@ -5,6 +5,7 @@ var CompanySchema = new Schema({
 	name: { type: String, required: true },
     description: { type: String },
     logo: { type: Schema.ObjectId, ref: "Image" },
+    cover: { type: Schema.ObjectId, ref: "Image" },
     members: [{ 
         userId: { type: Schema.ObjectId, ref: "User" },
         roleId: { type: Schema.ObjectId, ref: "Role" }
@@ -19,11 +20,11 @@ var CompanySchema = new Schema({
     updatedAt: { type: Date },
     createdBy: { type: Schema.ObjectId, ref:"User" },
     updatedBy: { type: Schema.ObjectId, ref:"User" },
-    ranking: { type: Number },
+    ranking: { type: Number },    
     privateKey: { type: String },
     publicKey: { type: String },
     allowCreditCard: { type: Boolean },
-    plan: { type: String }
+    plan: { type: String }    
 }).index({"location.coordinates": "2dsphere"});
 
 module.exports = mongoose.model("Company", CompanySchema);

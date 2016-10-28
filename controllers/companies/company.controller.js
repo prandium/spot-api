@@ -3,6 +3,7 @@ module.exports = function (apiRoutes) {
 	var Company = require("../../models/companies/company"),
 		ERRORS = require("../../constants/errors")
 		User = require("../../models/auth/user"),
+		Ranking = require("../../models/companies/ranking"),
 		jwt = require("jwt-simple"),
 		config = require("../../config/database");		
 		
@@ -56,6 +57,14 @@ module.exports = function (apiRoutes) {
         }).limit(parseInt(request.query.pageSize));
     };	
 
+	apiRoutes.get("/store/getById", getById);
+	function getById(request, response) {				
+        Company.findOne({ _id: request.query._id }, function(err, store){
+			if (err) { return response.status(500).send(err); }				
+			else { return response.status(200).send(store); };      
+		});
+    };	
+
 	apiRoutes.put("/companies/update", update);
 	function update() {
 		var token = request.body.token || request.query.token || request.headers["authorization"],
@@ -105,6 +114,36 @@ module.exports = function (apiRoutes) {
 			else return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });			
 		});
 	};
+	
+	apiRoutes.put("/companies/vote", vote);
+	function vote() {
+		var token = request.body.token || request.query.token || request.headers["authorization"],
+			_user;        
+        
+        if (token) { _user = jwt.decode(token, config.secret); }
+        else return response.status(403).send({ success: false, message: ERRORS.NO_TOKEN.Text });
+
+		Company.findOne({ _id: request.body.companyId }, function (err, company){
+			if (!err) {															
+				
+				company.ranking = 0;
+
+				if(!err) {
+					Ranking.count({ companyId: request.body.companyId }, function(_err, count) {
+						
+
+
+						company.save(function (_err) {
+							if(!_err) return response.status(200).send({ success: true, data: "Success" });				
+							else return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });
+						});
+
+					});
+				};								
+			}
+			else return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });			
+		});
+	};
 
 	apiRoutes.get("/companies/getAll", getAll);
 	function getAll(request, response) {
@@ -116,10 +155,21 @@ module.exports = function (apiRoutes) {
 
 	// FILTERS
 	function filter(query) {
-		return query.longitude && query.latitude 
-				? { $and: [filterByLocation(query.longitude, query.latitude), filterByName(query.text)] } 
-				: query.categoryId 
-				? filterByCategory(query.categoryId) 
+
+		return !query.longitude && !query.latitude && !query.text && !query.categoryId
+				? {}
+				: !query.longitude && !query.latitude && !query.text && query.categoryId
+				? filterByCategory(query.categoryId)
+				: !query.longitude && !query.latitude && query.text && !query.categoryId
+				? filterByName(query.text)
+				: !query.longitude && !query.latitude && query.text && query.categoryId
+				? { $and: [ filterByCategory(query.categoryId), filterByName(query.text) ] }
+				: query.longitude && query.latitude && !query.text && query.categoryId
+				? { $and: [ filterByLocation(query.longitude, query.latitude), filterByCategory(query.categoryId)] }
+				: query.longitude && query.latitude && query.text && !query.categoryId
+				? { $and: [ filterByLocation(query.longitude, query.latitude), filterByName(query.text)] }
+				: query.longitude && query.latitude && query.text && query.categoryId
+				? { $and: [ filterByLocation(query.longitude, query.latitude), filterByCategory(query.categoryId), filterByName(query.text)] }
 				: {}
 	}
 
@@ -135,13 +185,7 @@ module.exports = function (apiRoutes) {
 	}
 
 	function filterByName(name) {
-		return {
-			$text: {
-				$search: name,
-				$caseSensitive: false,
-				$diacriticSensitive: true
-			}
-		}
+		return {"name" : {$regex : ".*" + name + ".*", '$options' : 'i'}}
 	};
 
 	function filterByCategory(categoryId) {
