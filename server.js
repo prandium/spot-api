@@ -55,3 +55,4 @@ require("./controllers/app/menu.controller")(apiRoutes);
 require("./controllers/app/type.controller")(apiRoutes);
 require("./controllers/categories/category.controller")(apiRoutes);
 require("./controllers/products/products.controller")(apiRoutes);
+require("./controllers/qrcode/auth.controller")(apiRoutes);
