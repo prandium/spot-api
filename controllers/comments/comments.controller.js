@@ -11,7 +11,7 @@ module.exports = function (apiRoutes) {
         Comment.find({ to: request.query.storeId, isActive: true }, function(err, _comments) {
 			if (err) { return response.status(500).send(err); }				
 			else { return response.status(200).send(_comments); };            	            
-        });
+        }).populate("createdBy", "firstName lastName").sort([["createdAt", "1"]]);
     }
 
 	apiRoutes.post("/comments/add", addComment);
@@ -28,7 +28,7 @@ module.exports = function (apiRoutes) {
 				to: request.body.to, 		
                 body: request.body.body,
                 createdBy: _user._id,
-                createdAt: new Date().getUTCDate(),
+                createdAt: new Date(),
                 isActive: true
 			});
 			
@@ -52,7 +52,7 @@ module.exports = function (apiRoutes) {
 			Comment.findOne({ _id: request.query._id }, function (err, comment){
                 if (!err) {							
                     comment.body = request.body.body;
-                    comment.updatedAt = new Date().getUTCDate();                
+                    comment.updatedAt = new Date();                
                     comment.updatedBy = _user._id;			
                     
                     comment.save(function (err) {
