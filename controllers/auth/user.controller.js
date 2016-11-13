@@ -183,7 +183,7 @@ module.exports = function (apiRoutes) {
 				return response.status(400).send({success: false, msg: ERRORS.AUTH_USER_NOT_FOUND.Text, Code: ERRORS.AUTH_USER_NOT_FOUND.Code });
 			};						
 										
-			return response.status(200).send({ success: true, data: { username: user.username, fullName: user.firstName + " " + user.lastName, photo: user.photo.thumbnail.Path } });
+			return response.status(200).send({ success: true, data: { username: user.username, fullName: user.firstName + " " + user.lastName } });
 		}).populate('photo');
 	};
 };
