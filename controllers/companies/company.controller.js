@@ -1,6 +1,7 @@
 module.exports = function (apiRoutes) {
 
 	var Company = require("../../models/companies/company"),
+		Type = require("../../models/app/type"),
 		ERRORS = require("../../constants/errors")
 		User = require("../../models/auth/user"),
 		Ranking = require("../../models/companies/ranking"),
@@ -47,15 +48,33 @@ module.exports = function (apiRoutes) {
 	};	
 
 	apiRoutes.get("/companies/getStores", getStores);
-	function getStores(request, response) {				
-        Company.find( request.query.lastId 
-			? { $and : [filter(request.query), { "_id" : { $gt: request.query.lastId } }] } 
-			: filter(request.query)			
-			, function(err, _company) {
-			if (err) { return response.status(500).send(err); }				
-			else { return response.status(200).send(_company); };            	            
-        }).limit(parseInt(request.query.pageSize));
-    };	
+	function getStores(request, response) {	
+		var _categories = [];
+		if (request.query.typeId) {
+			Type.findOne({ _id: request.query.typeId }, function (err, type) {
+				for (var i=0; i < type.categories.length; i++) {
+					_categories.push(type.categories[i]);
+				};
+
+				Company.find( request.query.lastId 
+					? { $and : [filter(request.query, _categories), { "_id" : { $gt: request.query.lastId } }] } 
+					: filter(request.query, _categories)			
+					, function(err, _company) {
+						if (err) { return response.status(500).send(err); }				
+						else { return response.status(200).send(_company); };            	            
+				}).limit(parseInt(request.query.pageSize));
+			});
+		} 
+		else {
+			Company.find( request.query.lastId 
+				? { $and : [filter(request.query, _categories), { "_id" : { $gt: request.query.lastId } }] } 
+				: filter(request.query, _categories)			
+				, function(err, _company) {
+					if (err) { return response.status(500).send(err); }				
+					else { return response.status(200).send(_company); };            	            
+			}).limit(parseInt(request.query.pageSize));
+		};
+    };
 
 	apiRoutes.get("/store/getById", getById);
 	function getById(request, response) {				
@@ -151,30 +170,44 @@ module.exports = function (apiRoutes) {
 			if (err) { return response.status(500).send(err); }				
 			else { return response.status(200).send(_company); };            	            
         });
-    };	
+    };		
 
 	// FILTERS
-	function filter(query) {
+	function filter(query, categories) {
 
-		return !query.longitude && !query.latitude && !query.text && !query.categoryId
+		return    !query.longitude && !query.latitude && !query.text && !query.categoryId && !query.typeId
 				? {}
-				: !query.longitude && !query.latitude && !query.text && query.categoryId
+				: !query.longitude && !query.latitude && !query.text && query.categoryId && !query.typeId
 				? filterByCategory(query.categoryId)
-				: !query.longitude && !query.latitude && query.text && !query.categoryId
+				: !query.longitude && !query.latitude && query.text && !query.categoryId && !query.typeId
 				? filterByName(query.text)
-				: !query.longitude && !query.latitude && query.text && query.categoryId
+				: !query.longitude && !query.latitude && query.text && query.categoryId && !query.typeId
 				? { $and: [ filterByCategory(query.categoryId), filterByName(query.text) ] }
-				: query.longitude && query.latitude && !query.text && query.categoryId
+				: query.longitude && query.latitude && !query.text && query.categoryId && !query.typeId
 				? { $and: [ filterByLocation(query.longitude, query.latitude), filterByCategory(query.categoryId)] }
-				: query.longitude && query.latitude && query.text && !query.categoryId
+				: query.longitude && query.latitude && query.text && !query.categoryId && !query.typeId
 				? { $and: [ filterByLocation(query.longitude, query.latitude), filterByName(query.text)] }
-				: query.longitude && query.latitude && query.text && query.categoryId
+				: query.longitude && query.latitude && query.text && query.categoryId && !query.typeId
 				? { $and: [ filterByLocation(query.longitude, query.latitude), filterByCategory(query.categoryId), filterByName(query.text)] }
+				: !query.longitude && !query.latitude && !query.text && !query.categoryId && query.typeId
+				? filterByType(categories)
+				: !query.longitude && !query.latitude && query.text && !query.categoryId && query.typeId
+				? { $and: [ filterByType(categories), filterByName(query.text) ] }
+				: query.longitude && query.latitude && !query.text && !query.categoryId && query.typeId
+				? { $and: [ filterByLocation(query.longitude, query.latitude), filterByType(categories)] }
+				: query.longitude && query.latitude && query.text && !query.categoryId && query.typeId
+				? { $and: [ filterByLocation(query.longitude, query.latitude), filterByName(query.text), filterByType(categories)] }
 				: {}
 	}
 
+	function filterByType(categories) {
+		return {
+			categories: { $in : categories }
+		}
+	}
+
 	function filterByLocation(longitude, latitude){
-		return {location:
+		return { location:
 			{ $near :
 				{              
 					$geometry: { type: "Point",  coordinates: [ longitude, latitude] },            
