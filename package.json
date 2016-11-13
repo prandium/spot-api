@@ -15,8 +15,10 @@
     "morgan": "1.7.0",
     "multer": "1.1.0",
     "node-gyp": "^3.4.0",
+    "node-uuid": "^1.4.7",
     "passport": "0.3.2",
-    "passport-jwt": "2.0.0"
+    "passport-jwt": "2.0.0",
+    "qr-image": "^3.1.0"
   },
   "devDependencies": {
     "gulp-smushit": "^1.2.0"
