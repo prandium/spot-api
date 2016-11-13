@@ -4,15 +4,31 @@ module.exports = function (apiRoutes) {
 		ERRORS = require("../../constants/errors"),
 		User = require("../../models/auth/user"),
 		jwt = require("jwt-simple"),
-		config = require("../../config/database");		
+		config = require("../../config/database")
+		mongoose = require("mongoose");
 
     apiRoutes.get("/comments/getByStoreId", getByStoreId);
-    function getByStoreId(request, response){        
+    function getByStoreId(request, response){
+		var token = request.body.token || request.query.token || request.headers["authorization"],
+			_user;        
+        
+        if (token) { _user = jwt.decode(token, config.secret); }
+        else { return response.status(403).send({ success: false, message: ERRORS.NO_TOKEN.Text }); };
         Comment.find({ to: request.query.storeId, isActive: true }, function(err, _comments) {
-			if (err) { return response.status(500).send(err); }				
-			else { return response.status(200).send(_comments); };            	            
+			if (err) { return response.status(500).send(err); }								
+			else {
+				for (var i=0; i < _comments.length; i++) {		
+					_comments[i]._doc.canEdit = false;					
+								
+					var id = mongoose.Types.ObjectId(_user._id);
+					if (_comments[i].createdBy._id.id == id.id) {
+						_comments[i]._doc.canEdit = true;
+					};
+				};
+				return response.status(200).send(_comments); 
+			};            	            
         }).populate("createdBy", "firstName lastName").sort([["createdAt", "1"]]);
-    }
+    };
 
 	apiRoutes.post("/comments/add", addComment);
 	function addComment(request, response) {
@@ -63,5 +79,26 @@ module.exports = function (apiRoutes) {
                 else return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });			
             });			
 		};
+	};
+
+	apiRoutes.put("/comments/delete", deleteComment);
+	function deleteComment(request, response) {
+		var token = request.body.token || request.query.token || request.headers["authorization"],
+			_user;        
+        
+        if (token) { _user = jwt.decode(token, config.secret); }
+        else return response.status(403).send({ success: false, message: ERRORS.NO_TOKEN.Text });
+
+		Comment.findOne({ _id: request.query._id }, function (err, comment){
+			if (!err) {							
+				comment.isActive = false;			
+				
+				comment.save(function (err) {
+					if(!err) return response.status(200).send({ success: true, msg: "Success" });				
+					else return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });
+				});
+			}
+			else return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code });			
+		});					
 	};
 };
