@@ -89,7 +89,7 @@ module.exports = function (apiRoutes) {
         if (token) { _user = jwt.decode(token, config.secret); }
         else return response.status(403).send({ success: false, message: ERRORS.NO_TOKEN.Text });
 
-		Comment.findOne({ _id: request.query._id }, function (err, comment){
+		Comment.findOne({ _id: request.body._id }, function (err, comment){
 			if (!err) {							
 				comment.isActive = false;			
 				
