@@ -50,7 +50,7 @@ module.exports = function (apiRoutes) {
 			
 			newComment.save(function(err) {
 				if (err) { return response.status(500).send({success: false, msg: err}); }					
-				else { return response.status(201).send({success: true, msg: "Comment added successfully."}); };					
+				else { return response.status(201).send({success: true, msg: "Comment added successfully.", data: { _id: newComment._id }}); };					
 			});
 		};
 	};	
