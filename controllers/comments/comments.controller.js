@@ -65,7 +65,7 @@ module.exports = function (apiRoutes) {
 
 		if(!request.body.body) { return response.status(400).send({ success: false, msg: ERRORS.SERVICE.Text, code: ERRORS.SERVICE.Code }); }	
 		else {
-			Comment.findOne({ _id: request.query._id }, function (err, comment){
+			Comment.findOne({ _id: request.body._id }, function (err, comment){
                 if (!err) {							
                     comment.body = request.body.body;
                     comment.updatedAt = new Date();                
